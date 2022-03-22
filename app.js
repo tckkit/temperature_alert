@@ -2,12 +2,12 @@ const prompts = require("prompts");
 
 const defineThresholds = [
   {
-    type: "number",
+    type: "text",
     name: "freezing",
     message: "Define the threshold for freezing: ",
   },
   {
-    type: "number",
+    type: "text",
     name: "boiling",
     message: "Define the threshold for boiling: ",
   },
@@ -15,7 +15,7 @@ const defineThresholds = [
 
 const inputTemp = [
   {
-    type: "number",
+    type: "text",
     name: "inputTemp",
     message: "Please input a temperature: ",
   },
