@@ -24,81 +24,64 @@ const inputCurrTemp = [
   },
 ];
 
-let freezeTemp;
-let boilingTemp;
-let currTemp;
-let freezing = false;
-let boiling = false;
+async function main() {
+  const freezeTemp = await getInput(freezeThresholds);
+  const boilingTemp = await getInput(boilThresholds);
+  while (true) {
+    await checkTemp(freezeTemp, boilingTemp);
+  }
+}
 
-(async () => {
-  // Input validator (Check if the input is a valid number)
-  const validate = async (inputType) => {
-    let input;
-    while (!input) {
-      input = await prompts(inputType);
-      const integerTemp = parseFloat(input.temp);
-      if (integerTemp) {
-        return integerTemp;
-      } else {
-        console.log(`Invalid input. Input must be an integer.`);
-        input = false;
-      }
-    }
-  };
-
-  // Handling thresholds (freezing) input
-  while (!freezeTemp) {
-    freezeTemp = await validate(freezeThresholds);
+async function checkTemp(freezeTemp, boilingTemp, freezing, boiling) {
+  let currenTemp;
+  // // Check if currenTemp is reached or exceeded thresholds
+  if (!boiling && !freezing) {
+    currenTemp = await getInput(inputCurrTemp);
+    if (currenTemp <= freezeTemp) {
+      console.log(currenTemp.toFixed(1), "freezing");
+      freezing = true;
+    } else if (currenTemp >= boilingTemp) {
+      console.log(currenTemp.toFixed(1), "boiling");
+      boiling = true;
+    } else console.log(currenTemp.toFixed(1));
   }
 
-  // Handling thresholds (boiling) input
-  while (!boilingTemp) {
-    boilingTemp = await validate(boilThresholds);
+  // while is freezing, run below
+  while (freezing) {
+    currenTemp = await getInput(inputCurrTemp);
+    if (currenTemp >= boilingTemp) {
+      console.log(currenTemp.toFixed(1), "unfreezing and boiling");
+      boiling = true;
+      freezing = false;
+    } else if (currenTemp > freezeTemp + 0.5) {
+      console.log(currenTemp.toFixed(1), "unfreezing");
+      freezing = false;
+    } else console.log(currenTemp.toFixed(1));
   }
 
-  while (freezeTemp && boilingTemp) {
-    await (async () => {
-      // Handling temperature inputs
-      currTemp = await validate(inputCurrTemp);
-
-      // Check if currTemp is reached or exceeded thresholds
-      if (currTemp <= freezeTemp && !freezing) {
-        console.log(currTemp, "freezing");
-        freezing = true;
-      } else if (currTemp >= boilingTemp && !boiling) {
-        console.log(currTemp, "boiling");
-        boiling = true;
-      } else console.log(currTemp);
-
-      // while is freezing, run below
-      while (freezing) {
-        await (async () => {
-          currTemp = await validate(inputCurrTemp);
-          if (currTemp >= boilingTemp) {
-            console.log(currTemp, "unfreezing and boiling");
-            freezing = false;
-            boiling = true;
-          } else if (currTemp > freezeTemp + 0.5) {
-            console.log(currTemp, "unfreezing");
-            freezing = false;
-          } else console.log(currTemp);
-        })();
-      }
-
-      // while is boiling, run below
-      while (boiling) {
-        await (async () => {
-          currTemp = await validate(inputCurrTemp);
-          if (currTemp <= freezeTemp) {
-            console.log(currTemp, "unboiling and freezing");
-            boiling = false;
-            freezing = true;
-          } else if (currTemp < boilingTemp - 0.5) {
-            console.log(currTemp, "unboiling");
-            boiling = false;
-          } else console.log(currTemp);
-        })();
-      }
-    })();
+  // while is boiling, run below
+  while (boiling) {
+    currenTemp = await getInput(inputCurrTemp);
+    if (currenTemp <= freezeTemp) {
+      console.log(currenTemp.toFixed(1), "unboiling and freezing");
+      freezing = true;
+      boiling = false;
+    } else if (currenTemp < boilingTemp - 0.5) {
+      console.log(currenTemp.toFixed(1), "unboiling");
+      boiling = false;
+    } else console.log(currenTemp.toFixed(1));
   }
-})();
+
+  return checkTemp(freezeTemp, boilingTemp, freezing, boiling);
+}
+
+async function getInput(type) {
+  const answer = await prompts(type);
+  if (isNaN(parseFloat(answer.temp))) {
+    console.log(`Invalid input. Input must be an integer.`);
+    return await getInput(type);
+  }
+  return Number(answer.temp);
+}
+
+main();
