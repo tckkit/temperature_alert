@@ -27,14 +27,12 @@ const inputCurrTemp = [
 async function main() {
   const freezeTemp = await getInput(freezeThresholds);
   const boilingTemp = await getInput(boilThresholds);
-  while (true) {
-    await checkTemp(freezeTemp, boilingTemp);
-  }
+  checkTemp(freezeTemp, boilingTemp);
 }
 
 async function checkTemp(freezeTemp, boilingTemp, freezing, boiling) {
   let currenTemp;
-  // // Check if currenTemp is reached or exceeded thresholds
+  // Check if currenTemp is reached or exceeded thresholds
   if (!boiling && !freezing) {
     currenTemp = await getInput(inputCurrTemp);
     if (currenTemp <= freezeTemp) {
