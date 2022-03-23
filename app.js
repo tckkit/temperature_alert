@@ -1,61 +1,86 @@
 const prompts = require("prompts");
 
-const defineThresholds = [
+const freezeThresholds = [
   {
     type: "text",
-    name: "freezing",
+    name: "temp",
     message: "Define the threshold for freezing: ",
   },
+];
+
+const boilThresholds = [
   {
     type: "text",
-    name: "boiling",
+    name: "temp",
     message: "Define the threshold for boiling: ",
   },
 ];
 
-const inputTemp = [
+const inputCurrTemp = [
   {
     type: "text",
-    name: "inputTemp",
+    name: "temp",
     message: "Please input a temperature: ",
   },
 ];
 
-var freezeTemp;
-var boilingTemp;
-var currTemp;
-var freeze = false;
-var boiling = false;
+let freezeTemp;
+let boilingTemp;
+let currTemp;
+let freezing = false;
+let boiling = false;
 
 (async () => {
-  // Assign user input(thresholds) to freezeTemp and boilingTemp
-  const thresholds = await prompts(defineThresholds);
-  freezeTemp = thresholds.freezing;
-  boilingTemp = thresholds.boiling;
+  // Input validator (Check if the input is a valid number)
+  const validate = async (inputType) => {
+    let input;
+    while (!input) {
+      input = await prompts(inputType);
+      const integerTemp = parseFloat(input.temp);
+      if (integerTemp) {
+        return integerTemp;
+      } else {
+        console.log(`Invalid input. Input must be an integer.`);
+        input = false;
+      }
+    }
+  };
 
-  while (thresholds) {
+  // Handling thresholds (freezing) input
+  while (!freezeTemp) {
+    freezeTemp = await validate(freezeThresholds);
+  }
+
+  // Handling thresholds (boiling) input
+  while (!boilingTemp) {
+    boilingTemp = await validate(boilThresholds);
+  }
+
+  while (freezeTemp && boilingTemp) {
     await (async () => {
-      // Assign user input(temperature) to currTemp
-      const temp = await prompts(inputTemp);
-      currTemp = temp.inputTemp;
+      // Handling temperature inputs
+      currTemp = await validate(inputCurrTemp);
 
       // Check if currTemp is reached or exceeded thresholds
-      if (currTemp <= freezeTemp) {
+      if (currTemp <= freezeTemp && !freezing) {
         console.log(currTemp, "freezing");
-        freeze = true;
-      } else if (currTemp >= boilingTemp) {
+        freezing = true;
+      } else if (currTemp >= boilingTemp && !boiling) {
         console.log(currTemp, "boiling");
         boiling = true;
       } else console.log(currTemp);
 
       // while is freezing, run below
-      while (freeze) {
+      while (freezing) {
         await (async () => {
-          const temp = await prompts(inputTemp);
-          currTemp = temp.inputTemp;
-          if (currTemp > freezeTemp + 0.5) {
+          currTemp = await validate(inputCurrTemp);
+          if (currTemp >= boilingTemp) {
+            console.log(currTemp, "unfreezing and boiling");
+            freezing = false;
+            boiling = true;
+          } else if (currTemp > freezeTemp + 0.5) {
             console.log(currTemp, "unfreezing");
-            freeze = false;
+            freezing = false;
           } else console.log(currTemp);
         })();
       }
@@ -63,9 +88,12 @@ var boiling = false;
       // while is boiling, run below
       while (boiling) {
         await (async () => {
-          const temp = await prompts(inputTemp);
-          currTemp = temp.inputTemp;
-          if (currTemp < boilingTemp - 0.5) {
+          currTemp = await validate(inputCurrTemp);
+          if (currTemp <= freezeTemp) {
+            console.log(currTemp, "unboiling and freezing");
+            boiling = false;
+            freezing = true;
+          } else if (currTemp < boilingTemp - 0.5) {
             console.log(currTemp, "unboiling");
             boiling = false;
           } else console.log(currTemp);
