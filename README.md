@@ -33,10 +33,10 @@ Alerts are generated when a specific threshold has been reached or exceeded.
 - the return data will be display on screen.
 - "fluctuating" condition would be applied when previous temperature is freezing or boiling.
 
-### What is "fluctuating" condition?
+### What is fluctuating condition?
 
-“fluctuating” condition would set the thresholds for freezing and boiling to +0.5 and -0.5 respectively.
+fluctuating condition would set the thresholds for freezing and boiling to +0.5 and -0.5 respectively.
 
-**Example of "fluctuating" condition:**
+**Example of fluctuating condition:**
 
 if a freezing threshold is set to 0, previous temperature is -1 and the current temperature is 0.5. It would not trigger “unfreezing” alert, only when temperature is above 0.5 would trigger “unfreezing”.
