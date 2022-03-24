@@ -75,11 +75,15 @@ async function checkTemp(freezeTemp, boilingTemp, freezing, boiling) {
 
 async function getInput(type) {
   const answer = await prompts(type);
-  if (isNaN(parseFloat(answer.temp))) {
-    console.log(`Invalid input. Input must be an integer.`);
-    return await getInput(type);
+  if (answer.temp === "exit") {
+    process.exit();
+  } else {
+    if (isNaN(parseFloat(answer.temp))) {
+      console.log(`Invalid input. Input must be an integer.`);
+      return await getInput(type);
+    }
+    return Number(answer.temp);
   }
-  return Number(answer.temp);
 }
 
 main();
