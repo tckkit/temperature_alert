@@ -16,7 +16,7 @@ const boilThresholds = [
   },
 ];
 
-const inputCurrTemp = [
+const inputCurrenTemp = [
   {
     type: "text",
     name: "temp",
@@ -34,7 +34,7 @@ async function checkTemp(freezeTemp, boilingTemp, freezing, boiling) {
   let currenTemp;
   // Check if currenTemp is reached or exceeded thresholds
   if (!boiling && !freezing) {
-    currenTemp = await getInput(inputCurrTemp);
+    currenTemp = await getInput(inputCurrenTemp);
     if (currenTemp <= freezeTemp) {
       console.log(currenTemp.toFixed(1), "freezing");
       freezing = true;
@@ -46,7 +46,7 @@ async function checkTemp(freezeTemp, boilingTemp, freezing, boiling) {
 
   // while is freezing, run below
   while (freezing) {
-    currenTemp = await getInput(inputCurrTemp);
+    currenTemp = await getInput(inputCurrenTemp);
     if (currenTemp >= boilingTemp) {
       console.log(currenTemp.toFixed(1), "unfreezing and boiling");
       boiling = true;
@@ -59,7 +59,7 @@ async function checkTemp(freezeTemp, boilingTemp, freezing, boiling) {
 
   // while is boiling, run below
   while (boiling) {
-    currenTemp = await getInput(inputCurrTemp);
+    currenTemp = await getInput(inputCurrenTemp);
     if (currenTemp <= freezeTemp) {
       console.log(currenTemp.toFixed(1), "unboiling and freezing");
       freezing = true;
@@ -79,7 +79,9 @@ async function getInput(type) {
     process.exit();
   } else {
     if (isNaN(parseFloat(answer.temp))) {
-      console.log(`Invalid input. Input must be an integer.`);
+      console.log(
+        `Invalid input. Input must be an integer or 'exit' to exit program`
+      );
       return await getInput(type);
     }
     return Number(answer.temp);
